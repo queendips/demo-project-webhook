@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "Running the app.."
+echo "Running the app..."
 
