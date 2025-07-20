@@ -26,7 +26,12 @@ pipeline {
             }
         }
 
-       
+        stage('Run') {
+            steps {
+                echo '🚀 Running the application...'
+                sh './run.sh' // Added run stage to execute run.sh script
+            }
+        }
     }
 
     post {
@@ -38,3 +43,4 @@ pipeline {
         }
     }
 }
+
