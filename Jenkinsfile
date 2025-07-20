@@ -26,12 +26,7 @@ pipeline {
             }
         }
 
-        stage('Run') {
-            steps {
-                echo '🚀 Running the application...'
-                sh './run.sh' // Make sure this file exists and is executable
-            }
-        }
+       
     }
 
     post {
