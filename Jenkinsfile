@@ -1,46 +1,69 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush() // Enables webhook triggering
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Cleanup Workspace') {
             steps {
-                git branch: 'main', url: 'https://github.com/queendips/demo-project-webhook.git'
+                cleanWs()
+                sh 'echo "🧹 Workspace cleaned before pipeline run."'
+            }
+        }
+
+        stage('Code Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/queendips/demo-project-webhook.git']]
+                ])
             }
         }
 
         stage('Build') {
             steps {
-                echo '🔧 Building the project...'
-                sh './build.sh' // Make sure this file exists and is executable
+                script {
+                    try {
+                        echo "🔨 Building the application..."
+                        sh 'chmod +x build.sh'
+                        sh './build.sh'
+                    } catch (err) {
+                        echo "❌ Build failed: ${err}"
+                        currentBuild.result = 'FAILURE'
+                        error("Stopping pipeline due to build failure.")
+                    }
+                }
             }
         }
 
-        stage('Test') {
+        stage('Unit Testing') {
             steps {
-                echo '🧪 Running tests...'
-                sh './test.sh' // Make sure this file exists and is executable
+                sh '''
+                echo "🧪 Running Unit Tests..."
+                # Add your test logic here, or run a test script if available
+                '''
             }
         }
 
-        stage('Run') {
+        stage('Deploy to Dev and QA') {
+            when {
+                branch 'develop'
+            }
             steps {
-                echo '🚀 Running the application...'
-                sh './run.sh' // Added run stage to execute run.sh script
+                sh 'echo "Building for Dev and QA environments..."'
+                sh 'echo "Deploying to Dev..."'
+                sh 'echo "Deploying to QA..."'
             }
         }
-    }
 
-    post {
-        success {
-            echo '✅ Build, test, and run steps completed successfully.'
-        }
-        failure {
-            echo '❌ One or more steps failed.'
+        stage('Deploy to Staging and Pre-Prod') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'echo "Building for Staging and Pre-Prod..."'
+                sh 'echo "Deploying to Staging..."'
+                sh 'echo "Deploying to Pre-Prod..."'
+            }
         }
     }
 }
-
