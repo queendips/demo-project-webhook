@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "🚀 Running test.sh..."
+
+# Display system info
+echo "🖥️ Hostname: $(hostname)"
+echo "📅 Date: $(date)"
+echo "👤 User: $(whoami)"
+
+# Simulate a build step
+echo "🔧 Simulating build process..."
+sleep 2
+echo "✅ Build simulation complete."
+
+# Exit successfully
+exit 0
